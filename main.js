@@ -121,17 +121,16 @@ Guy.prototype.draw = function () {
     Entity.prototype.draw.call(this);
 }
 
-
 AM.queueDownload("./img/RobotUnicorn.png");
 AM.queueDownload("./img/guy.jpg");
 AM.queueDownload("./img/mushroomdude.png");
 AM.queueDownload("./img/runningcat.png");
 AM.queueDownload("./img/background.jpg");
+AM.queueDownload("./img/Running.png");
 
 AM.downloadAll(function () {
     var canvas = document.getElementById("gameWorld");
     var ctx = canvas.getContext("2d");
-
     var gameEngine = new GameEngine();
     gameEngine.init(ctx);
     gameEngine.start();
@@ -140,6 +139,9 @@ AM.downloadAll(function () {
     gameEngine.addEntity(new MushroomDude(gameEngine, AM.getAsset("./img/mushroomdude.png")));
     gameEngine.addEntity(new Cheetah(gameEngine, AM.getAsset("./img/runningcat.png")));
     gameEngine.addEntity(new Guy(gameEngine, AM.getAsset("./img/guy.jpg")));
+
+
+    var zoro = new Zoro(gameEngine, AM.getAsset("./img/Running.png"));
 
     console.log("All Done!");
 });
