@@ -14,6 +14,7 @@ function GameEngine() {
     this.ctx = null;
     this.surfaceWidth = null;
     this.surfaceHeight = null;
+    this.move = false;
 }
 
 GameEngine.prototype.init = function (ctx) {
@@ -110,6 +111,7 @@ GameEngine.prototype.draw = function () {
     }
     this.ctx.restore();
 }
+
 
 GameEngine.prototype.update = function () {
     var entitiesCount = this.entities.length;
