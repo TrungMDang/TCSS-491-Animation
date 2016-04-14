@@ -97,7 +97,7 @@ Foreground.prototype.draw = function () {
 
 Foreground.prototype.update = function () {
     if (this.game.move)
-        this.x -= 1;
+        this.x -= 2;
     //this.game.parallax_x1 -= 2;
     //if (this.game.parallax_x1 < -960) {
     //    this.game.parallax_x1 = 0;
@@ -120,7 +120,7 @@ ForegroundLater.prototype.draw = function () {
 
 ForegroundLater.prototype.update = function () {
     if (this.game.move)
-        this.x -= 1;
+        this.x -= 2;
     //this.game.parallax_x1 -= 2;
     //if (this.game.parallax_x1 < -960) {
     //    this.game.parallax_x1 = 0;
