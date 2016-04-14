@@ -78,7 +78,7 @@ BackgroundLater.prototype.draw = function () {
 
 BackgroundLater.prototype.update = function () {
     if (this.game.move)
-        this.x -= 1;
+        this.x -= 0.5;
     //this.game.parallax_x2 -= 1;
 };
 function Foreground(game, spritesheet) {
@@ -97,7 +97,7 @@ Foreground.prototype.draw = function () {
 
 Foreground.prototype.update = function () {
     if (this.game.move)
-        this.x -= 1.5;
+        this.x -= 1;
     //this.game.parallax_x1 -= 2;
     //if (this.game.parallax_x1 < -960) {
     //    this.game.parallax_x1 = 0;
@@ -120,7 +120,7 @@ ForegroundLater.prototype.draw = function () {
 
 ForegroundLater.prototype.update = function () {
     if (this.game.move)
-        this.x -= 1.5;
+        this.x -= 1;
     //this.game.parallax_x1 -= 2;
     //if (this.game.parallax_x1 < -960) {
     //    this.game.parallax_x1 = 0;
