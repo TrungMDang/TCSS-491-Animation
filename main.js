@@ -40,9 +40,14 @@ Animation.prototype.isDone = function () {
     return (this.elapsedTime >= this.totalTime);
 }
 
+
 // no inheritance
-function Background(game, spritesheet) {
-    this.x = 0;
+function Background(game, x, goBackX, spritesheet) {
+    this.x = x;
+    this.xCopy = x;
+
+    this.goBackX = goBackX,
+
     this.y = 0;
     this.scale = 0.5;
     this.spritesheet = spritesheet;
@@ -50,39 +55,26 @@ function Background(game, spritesheet) {
     this.ctx = game.ctx;
 };
 
-
 Background.prototype.draw = function () {
     this.ctx.drawImage(this.spritesheet,
-        this.x, this.y, 1920, 540);
+        this.x, this.y, 1280, 540);
 };
 
 Background.prototype.update = function () {
     if (this.game.move)
-        this.x -= 1;
+        this.x -= 0.25;
+    //Move past canvas
+    if (this.x < this.goBackX) {
+        this.x = this.xCopy;
+    }
     //this.game.parallax_x2 -= 1;
 };
-function BackgroundLater(game, spritesheet) {
-    this.x = 1920;
-    this.y = 0;
-    this.scale = 0.5;
-    this.spritesheet = spritesheet;
-    this.game = game;
-    this.ctx = game.ctx;
-};
+function Foreground(game, x, goBackX, spritesheet) {
+    this.x = x;
+    this.xCopy = x;
 
+    this.goBackX = goBackX;
 
-BackgroundLater.prototype.draw = function () {
-    this.ctx.drawImage(this.spritesheet,
-        this.x, this.y, 1920, 540);
-};
-
-BackgroundLater.prototype.update = function () {
-    if (this.game.move)
-        this.x -= 0.5;
-    //this.game.parallax_x2 -= 1;
-};
-function Foreground(game, spritesheet) {
-    this.x = 0;
     this.y = 0;
     this.scale = 0.5;
     this.spritesheet = spritesheet;
@@ -96,37 +88,18 @@ Foreground.prototype.draw = function () {
 };
 
 Foreground.prototype.update = function () {
-    if (this.game.move)
-        this.x -= 2;
-    //this.game.parallax_x1 -= 2;
-    //if (this.game.parallax_x1 < -960) {
-    //    this.game.parallax_x1 = 0;
-    //    this.x = this.game.parallax_x1;
-    //}
-};
-function ForegroundLater(game, spritesheet) {
-    this.x = 1920;
-    this.y = 0;
-    this.scale = 0.5;
-    this.spritesheet = spritesheet;
-    this.game = game;
-    this.ctx = game.ctx;
+    if (this.game.move) {
+        if (this.game.dash) {
+            this.x -= 5;
+        } else {
+            this.x -= 2;
+        }
+    }
+    if (this.x < this.goBackX) {
+        this.x = this.xCopy;
+    }
 };
 
-ForegroundLater.prototype.draw = function () {
-    this.ctx.drawImage(this.spritesheet,
-        this.x, this.y, 1920, 540);
-};
-
-ForegroundLater.prototype.update = function () {
-    if (this.game.move)
-        this.x -= 2;
-    //this.game.parallax_x1 -= 2;
-    //if (this.game.parallax_x1 < -960) {
-    //    this.game.parallax_x1 = 0;
-    //    this.x = this.game.parallax_x1;
-    //}
-};
 //function Foreground1(game, spritesheet) {
 //    this.x = game.parallax_x2;
 //    this.y = game.parallax_y2;
@@ -192,26 +165,27 @@ ForegroundLater.prototype.update = function () {
 //}
 //
 //// inheritance
-//function Guy(game, spritesheet) {
-//    this.animation = new Animation(spritesheet, 154, 215, 4, 0.15, 8, true, 0.5);
-//    this.speed = 100;
-//    this.ctx = game.ctx;
-//    Entity.call(this, game, 0, 450);
-//}
-//
-//Guy.prototype = new Entity();
-//Guy.prototype.constructor = Guy;
-//
-//Guy.prototype.update = function () {
-//    this.x += this.game.clockTick * this.speed;
-//    if (this.x > 800) this.x = -230;
-//    Entity.prototype.update.call(this);
-//}
-//
-//Guy.prototype.draw = function () {
-//    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-//    Entity.prototype.draw.call(this);
-//}
+function Sunny(game, spritesheet) {
+    this.speed = 100;
+    this.x = 480;
+    this.y = 6;
+    this.game = game;
+    this.ctx = game.ctx
+    this.sheet = spritesheet;
+}
+
+Sunny.prototype = new Entity();
+Sunny.prototype.constructor = Sunny;
+
+Sunny.prototype.update = function () {
+    if (this.game.move)
+        this.x -= 0.25;
+}
+
+Sunny.prototype.draw = function () {
+    this.ctx.drawImage(this.sheet,
+        this.x, this.y, 230 * 1.98, 230 * 1.98);
+}
 
 function calcParallax(tileheight, speedratio, scrollposition) {
     //    by Brett Taylor http://inner.geek.nz/
@@ -246,24 +220,46 @@ AM.queueDownload("./img/RobotUnicorn.png");
 AM.queueDownload("./img/guy.jpg");
 AM.queueDownload("./img/mushroomdude.png");
 AM.queueDownload("./img/runningcat.png");
+
 AM.queueDownload("./img/background.png");
 AM.queueDownload("./img/foreground.png");
+AM.queueDownload("./img/water.png");
 
 AM.queueDownload("./img/Idle.png");
 AM.queueDownload("./img/Running.png");
 AM.queueDownload("./img/Dash.png");
+AM.queueDownload("./img/Guard.png");
+AM.queueDownload("./img/thousand_sunny.png");
+
+//props
+AM.queueDownload("./img/barrel.png");
+
 
 AM.downloadAll(function () {
     var canvas = document.getElementById("gameWorld");
+    var canvas2 = document.getElementById("secondGameWorld");
+
     var ctx = canvas.getContext("2d");
+    var ctx2 = canvas2.getContext("2d");
+
     var gameEngine = new GameEngine();
+    var gameEngine2 = new GameEngine();
+
+    gameEngine2.init(ctx2);
+    gameEngine2.start();
+
     gameEngine.init(ctx);
     gameEngine.start();
 
-    gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/background.png")));
-    gameEngine.addEntity(new BackgroundLater(gameEngine, AM.getAsset("./img/background.png")));
-    gameEngine.addEntity(new Foreground(gameEngine, AM.getAsset("./img/foreground.png")));
-    gameEngine.addEntity(new ForegroundLater(gameEngine, AM.getAsset("./img/foreground.png")));
+
+    gameEngine2.addEntity(new Background(gameEngine2, 1270, 0, AM.getAsset("./img/background.png")));
+    gameEngine2.addEntity(new Background(gameEngine2, 0, -1280, AM.getAsset("./img/background.png")));
+    gameEngine2.addEntity(new Sunny(gameEngine2, AM.getAsset("./img/thousand_sunny.png")));
+    gameEngine2.addEntity(new Background(gameEngine2, 0, -1920, AM.getAsset("./img/water.png")));
+
+    //gameEngine2.addEntity(new BackgroundLater(gameEngine2, AM.getAsset("./img/background.png")));
+    gameEngine.addEntity(new Foreground(gameEngine, 0, -1920, AM.getAsset("./img/foreground.png")));
+    gameEngine.addEntity(new Foreground(gameEngine, 1920, 0, AM.getAsset("./img/foreground.png")));
 
 
     // gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/background - 2 - 1.png")));
@@ -272,12 +268,15 @@ AM.downloadAll(function () {
     //gameEngine.addEntity(new Cheetah(gameEngine, AM.getAsset("./img/runningcat.png")));
     //gameEngine.addEntity(new Guy(gameEngine, AM.getAsset("./img/guy.jpg")));
 
-    var spritesheets = [];
-    spritesheets.push(AM.getAsset("./img/Idle.png"));
-    spritesheets.push(AM.getAsset("./img/Running.png"));
-    spritesheets.push(AM.getAsset("./img/Dash.png"));
+    var spriteSheets = [];
+    spriteSheets.push(AM.getAsset("./img/Idle.png"));
+    spriteSheets.push(AM.getAsset("./img/Running.png"));
+    spriteSheets.push(AM.getAsset("./img/Dash.png"));
+    spriteSheets.push(AM.getAsset("./img/Guard.png"));
 
-    var zoro = new Zoro(gameEngine, spritesheets);
+   gameEngine.addEntity(new Prop(gameEngine, AM.getAsset("./img/barrel.png"), 970, 400, 140, 190, 2, false, 0))
+
+    var zoro = new Zoro(gameEngine, gameEngine2, spriteSheets);
     gameEngine.addEntity(zoro);
 
     console.log("All Done!");
