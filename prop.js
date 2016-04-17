@@ -2,7 +2,7 @@
  * Created by trung on 4/15/2016.
  */
 function Prop(game, spriteSheet, x, y, scaleX, scaleY, speed, moveRight, goBack) {
-    this.sheet = spriteSheet;
+    this.image = spriteSheet;
     this.game = game;
     this.ctx = game.ctx;
     this.x = x;
@@ -32,6 +32,6 @@ Prop.prototype.update = function () {
 }
 
 Prop.prototype.draw = function () {
-    this.ctx.drawImage(this.sheet,
+    this.ctx.drawImage(this.image,
         this.x, this.y, this.scaleX * 0.25, this.scaleY * 0.25);
 }

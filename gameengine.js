@@ -16,6 +16,7 @@ function GameEngine() {
     this.surfaceHeight = null;
     this.move = false;
     this.dash = false;
+    this.skill = false;
 }
 
 GameEngine.prototype.init = function (ctx) {

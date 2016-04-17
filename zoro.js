@@ -1,24 +1,41 @@
-function Zoro(game, game2, spritesheets) {
+function Zoro(game, spritesheets) {
     this.ctx = game.ctx;
-    this.ctx2 = game2.ctx;
-    this.game2 = game2;
     this.scale = 1.5;
-    this.idle = new Animation(spritesheets[0], 65, 70, 261, 0.5, 4, true, this.scale);
-    this.running = new Animation(spritesheets[1], 79, 50, 632, 0.15 ,8, true, this.scale);
-    this.dash = new Animation(spritesheets[2], 82, 50, 577, 0.15, 7, true, this.scale);
-    this.guard = new Animation(spritesheets[3], 55, 55, 165, 0.5, 3, true, this.scale);
+    var framesWidth = [];
+    var framesHeight = [];
+    this.idle = new Animation(spritesheets["Idle"], 65, 70, 261, 0.5, 4, true, this.scale,  framesWidth, framesHeight);
+    this.running = new Animation(spritesheets["Run"], 79, 50, 632, 0.15 ,8, true, this.scale, framesWidth, framesHeight);
+    this.dash = new Animation(spritesheets["Dash"], 82, 50, 577, 0.15, 7, true, this.scale,  framesWidth, framesHeight);
+    this.guard = new Animation(spritesheets["Guard"], 55, 55, 165, 0.5, 3, true, this.scale,  framesWidth, framesHeight);
+
+    //Skills
+    var framesWidth = [51, 79 , 65, 70, 70, 54, 52];
+    this.tatsumaki = new Animation(spritesheets["Tatsumaki"], 0, 50, 555, 0.3, 7, true, this.scale, framesWidth, framesHeight);
+
+    var framesWidth = [52, 67, 66, 66, 66, 66];
+    //var framesHeight = [23, 46, 71, 78, 104, 62];
+    var framesHeight = [25, 59, 91, 107, 141, 145];
+
+    this.particleTatsumaki = new Animation(spritesheets["ParticleTatsumaki"], 0, 0, 383, 0.35, 6, true, this.scale, framesWidth, framesHeight)
+    this.offsetX = 0;
+    this.offsetY = 0;
+
+    this.skill = false;
+    this.skillName = null;
     this.speed = this.scale * 50;
     this.dashSpeed = this.scale * 200;
     this.acceleration = this.scale * 1.5;
     this.actionSheet = this.idle;
+    this.particleSheet = null;
+
     this.actionAnchor = [];
     this.actionAnchor.push(351);
-    this.actionAnchor.push(370);
-    this.actionAnchor.push(367);
+    this.actionAnchor.push(369);
+    this.actionAnchor.push(377);
 
     this.line = createLine();
     this.move = false;
-    this.count = 0;
+    this.elapsedTime = 0;
     Entity.call(this, game, 0, this.actionAnchor[0]);
 }
 
@@ -64,6 +81,7 @@ function createLine(x1, y1, x2, y2) {
  **************************************************************************************/
 
 Zoro.prototype.update = function (){
+
     //console.log(this.game.clockTick);
 
     //Move out of canvas
@@ -71,66 +89,75 @@ Zoro.prototype.update = function (){
         this.move = false;
         this.game.move = false;
         this.game.dash =  false;
-        this.game2.move = false;
-        this.game2.dash =  false;
 
         this.actionSheet = this.idle;
 
         this.speed = this.scale * 50;
         this.x = 0;
         this.y = this.actionAnchor[0];
-        this.count = 0;
-    }
-
-    //Inside canvas. Permit to move
-    if (this.move) {
-        if (this.x >= 200 && this.x <= 400) {           //Dash
+        this.elapsedTime = 0;
+    } else {                             //Inside canvas. Permit to move
+        this.elapsedTime++;
+        if (this.elapsedTime > 100 && this.elapsedTime <= 200) {     //Run
+            this.move = true;
+            this.game.move = true;
+            this.actionSheet = this.running;
+            this.particleSheet = null;
+            this.x += this.game.clockTick * (this.speed);
+            this.y = this.actionAnchor[1];
+        } else if (this.elapsedTime > 200 && this.x <= 300) {       //Dash
             this.speed = this.dashSpeed;
             this.x += this.game.clockTick * (this.speed);
             this.actionSheet = this.dash;
+            this.particleSheet = null;
             this.game.dash = true;
-            this.game2.dash = true;
-        } else if (this.x > 400) {
-            //console.log(this.count);
-            if (this.count > 200) {            //Running again
-                this.move = true;
-                this.game.move = true;
-                this.game2.move = true;
-                this.x += this.game.clockTick * (this.speed);
-                this.actionSheet = this.running;
-                this.y = this.actionAnchor[1];
-            } else {                             //Guard
-                this.count++;
-                this.x = 401;
-                //this.y = this.actionAnchor[2];
-                this.speed = this.scale * 50;
-                this.actionSheet = this.guard;
-                this.game.move = false;
-                this.game2.move = false;
-                this.game.dash = false;
-                this.game2.dash = false;
+
+        } else if (this.elapsedTime > 301 && this.elapsedTime <= 400) {            //Guard
+            //console.log(this.elapsedTime);
+            //this.y = this.actionAnchor[2];
+            this.speed = this.scale * 50;
+            this.actionSheet = this.guard;
+            this.particleSheet = null;
+
+            this.game.move = false;
+            this.game.dash = false;
+
+            this.y = this.actionAnchor[1];
+
+        } else if (this.elapsedTime > 400 && this.elapsedTime <= 500) {     //Skill - Dragon Twister
+            this.move = false;
+            this.game.move = false;
+            this.skill = true;
+            this.game.skill = true;
+            this.actionSheet = this.tatsumaki;
+            if (this.elapsedTime > 420 && this.elapsedTime <= 500) {
+                this.particleSheet = this.particleTatsumaki;
+                this.offsetY = 55;
             }
-        } else {
-            //this.game.dash = false;
-            this.x += this.game.clockTick * (this.speed);
-        }
-    } else {
-        this.count++;
-        if (this.count > 100) {         //Running
+            this.y = this.actionAnchor[2];
+            this.offsetX = 9;
+
+        } else if (this.elapsedTime > 645) {
             this.move = true;
             this.game.move = true;
-            this.game2.move = true;
             this.actionSheet = this.running;
-            this.x = this.x + 20;
+            this.particleSheet = null;
+            this.x += this.game.clockTick * (this.speed);
             this.y = this.actionAnchor[1];
         }
     }
+
+
     Entity.prototype.update.call(this);
 
 };
 Zoro.prototype.draw = function(game) {
-    //document.body.appendChild(createLine(10, 450, 960, 450));
-    this.actionSheet.drawFrame(this.game.clockTick, this.game.ctx, this.x, this.y);
+    //document.body.appendChild(createLine(10, 450, 1920, 450));
+    if (this.actionSheet !== null)
+     this.actionSheet.drawFrame(this.game.clockTick, this.game.ctx, this.x, this.y);
+    if (this.particleSheet !== null) {
+        this.particleSheet.drawFrame(this.game.clockTick, this.game.ctx, this.x - this.offsetX, this.y + this.offsetY);
+    }
     Entity.prototype.draw.call(this);
 };
 
