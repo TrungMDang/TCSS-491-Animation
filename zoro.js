@@ -86,18 +86,22 @@ Zoro.prototype.update = function (){
 
     //Move out of canvas
     if (this.x > 960) {
+        this.elapsedTime = 0;
         this.move = false;
         this.game.move = false;
         this.game.dash =  false;
-
+        this.skill = false;
+        this.game.skill = false;
         this.actionSheet = this.idle;
 
         this.speed = this.scale * 50;
         this.x = 0;
         this.y = this.actionAnchor[0];
-        this.elapsedTime = 0;
+        console.log("Elapsed time: " + this.elapsedTime);
     } else {                             //Inside canvas. Permit to move
         this.elapsedTime++;
+        console.log("Elapsed time: " + this.elapsedTime);
+
         if (this.elapsedTime > 100 && this.elapsedTime <= 200) {     //Run
             this.move = true;
             this.game.move = true;
@@ -106,13 +110,12 @@ Zoro.prototype.update = function (){
             this.x += this.game.clockTick * (this.speed);
             this.y = this.actionAnchor[1];
         } else if (this.elapsedTime > 200 && this.x <= 300) {       //Dash
-            this.speed = this.dashSpeed;
-            this.x += this.game.clockTick * (this.speed);
+            this.x += this.game.clockTick * (this.dashSpeed);
             this.actionSheet = this.dash;
             this.particleSheet = null;
             this.game.dash = true;
 
-        } else if (this.elapsedTime > 301 && this.elapsedTime <= 400) {            //Guard
+        } else if (this.elapsedTime > 300 && this.elapsedTime <= 400) {            //Guard
             //console.log(this.elapsedTime);
             //this.y = this.actionAnchor[2];
             this.speed = this.scale * 50;
@@ -124,20 +127,31 @@ Zoro.prototype.update = function (){
 
             this.y = this.actionAnchor[1];
 
-        } else if (this.elapsedTime > 400 && this.elapsedTime <= 500) {     //Skill - Dragon Twister
+        } else if (this.elapsedTime > 400 && this.elapsedTime <= 570) {     //Skill - Dragon Twister
+            //if (this.skill) {
+            //    if (this.actionSheet.isDone()) {
+            //        this.move = true;
+            //        this.game.move = true;
+            //        this.actionSheet = this.running;
+            //        this.particleSheet = null;
+            //        this.x += this.game.clockTick * (this.speed);
+            //        this.y = this.actionAnchor[1];
+            //    }
+            //}
+
             this.move = false;
             this.game.move = false;
             this.skill = true;
             this.game.skill = true;
             this.actionSheet = this.tatsumaki;
-            if (this.elapsedTime > 420 && this.elapsedTime <= 500) {
+
                 this.particleSheet = this.particleTatsumaki;
                 this.offsetY = 55;
-            }
+
             this.y = this.actionAnchor[2];
             this.offsetX = 9;
 
-        } else if (this.elapsedTime > 645) {
+        } else if (this.elapsedTime > 570) {
             this.move = true;
             this.game.move = true;
             this.actionSheet = this.running;
